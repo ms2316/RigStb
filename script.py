@@ -2,6 +2,7 @@ import urllib2
 import json
 import model
 import sqlalchemy
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 #Returns url of the given rig/stb
@@ -11,6 +12,7 @@ def get_url(rig, stb):
 	else:
 		return "http://testaut-" + str(rig) + "-switch-pc:10000/stb-" + str(stb)
 
+#Creates Stb model object from jdata+rig_no+stb_no
 def json_to_stb(jdata, rig, stb):
 	return model.Stb(
 	rig_no = rig,
@@ -35,7 +37,7 @@ def get_stb_status(rig, stb):
 
 def save_machine_status():
 	#Establish connection with db
-	engine = model.create_engine('postgresql://stb-tester:testaut@localhost:57998/testaut', echo = False)
+	engine = create_engine('postgresql://stb-tester:testaut@localhost:57998/testaut', echo = False)
 	Session = sessionmaker(bind = engine)
 	session = Session() #establish a connection
 
@@ -52,7 +54,7 @@ def save_machine_status():
 
 	session.commit()
 	session.close()
-	
+
 #test
 #save_machine_status()
 '''
