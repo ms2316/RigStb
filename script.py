@@ -1,5 +1,8 @@
 import urllib2
 import json
+import model
+import sqlalchemy
+from sqlalchemy.orm import sessionmaker
 
 #Returns url of the given rig/stb
 def get_url(rig, stb):
@@ -17,21 +20,27 @@ def get_stb_status(rig, stb):
 	#except urllib2.HTTPError:
 	#	return "Invalid rig/stb"
 
-def status_record():
-	data = {}
+def save_machine_status():
+	#Establish connection with db
+	engine = model.create_engine('postgresql://stb-tester:testaut@localhost:57998/testaut', echo = True)
+	Session = sessionmaker(bind = engine)
+	session = Session() #establish a connection
+
 	#gather status of rigs 1 to 10
-	for rig in range(1,11):
+	for rig in range(1,13):
 		for stb in range(1,8):
 			try:
 				jdata = get_stb_status(rig,stb)
-				data["rig" + str(rig) + "stb" + str(stb)] = jdata
+				#Convert jdata to Stb
+				#Save to database
 			except Exception:
-				#get_stb_status returned with an error
+				#get_stb_status() returned with an error
 				pass
-	#flush data to DB
 
+	session.commit()
+	session.close()
 #test
-status_record()
+save_machine_status()
 
 tmp =  get_stb_status(1,8)
 box = tmp['box']
